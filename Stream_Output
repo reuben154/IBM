@@ -1,0 +1,11 @@
+Aug 31, 2018 3:06:58 PM com.ibm.streamsx.topology.internal.context.remote.RemoteContexts checkServiceRunning
+INFO: Streaming Analytics service (Python Data Analysis): Checking status
+Aug 31, 2018 3:07:04 PM com.ibm.streamsx.topology.internal.context.remote.RemoteContexts checkServiceRunning
+INFO: Streaming Analytics service (Python Data Analysis): instance status response:{"state":"STARTED","plan":"lite","enabled":true,"status":"running"}
+Aug 31, 2018 3:07:04 PM com.ibm.streamsx.rest.AbstractStreamingAnalyticsService buildAndSubmitJob
+INFO: Streaming Analytics service (Python Data Analysis): submitting build module_08265E79935798C2
+Aug 31, 2018 3:08:04 PM com.ibm.streamsx.rest.AbstractStreamingAnalyticsService buildAndSubmitJob
+INFO: Streaming Analytics service (Python Data Analysis): submitting job request.
+Aug 31, 2018 3:08:15 PM com.ibm.streamsx.rest.StreamingAnalyticsServiceV1 submitBuildArtifact
+INFO: Streaming Analytics service (Python Data Analysis): submit job response: {"artifact":"42140","jobId":"0","application":"ipythoninput1210712b2bd3ed::module","name":"ipythoninput1210712b2bd3ed::module_0","state":"STARTED","plan":"lite","enabled":true,"status":"running"}
+{'enabled': True, 'jobId': '0', 'name': 'ipythoninput1210712b2bd3ed::module_0', 'status': 'running', 'application': 'ipythoninput1210712b2bd3ed::module', 'instanceId': '9bf3970c-b3a7-4b41-84d9-b072c2642c03', 'artifact': '42140', 'state': 'STARTED', 'submitMetrics': {'jobSubmissionTime_ms': 10580, 'buildArchiveSize': 3858230, 'totalBuildTime_ms': 41687, 'buildArchiveUploadTime_ms': 16918, 'buildState_buildingTime_ms': 39179}, 'return_code': 0, 'plan': 'lite'}
