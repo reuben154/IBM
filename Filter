@@ -1,0 +1,31 @@
+#Code after writing Lambda funtion to filter unwanted data
+from streamsx.topology.topology import Topology
+from streamsx.topology.context import *
+import json
+import time
+
+#Set up access to Streaming Analytics service
+vs={'streaming-analytics': [{'name': service_name, 'credentials': json.loads (credentials)}]}
+cfg = {}
+cfg[ConfigParams.VCAP_SERVICES] = vs
+cfg[ConfigParams.SERVICE_NAME] = service_name
+2
+# Define data source
+def Observations():
+    while True:
+        jsonStr = '''{"patientId":"patient-1", "device":{"id":"VitalsGenerator","locationId":"bed1"}, "readingSource": {"id":123, "deviceId":"VitalsGenerator", "sourceType":"generated"},"reading": {"ts": 605, "uom":"bpm", "value":82.56785326532197,"readingType": {"code":"8867-4", "system":"streamsx.health/1.0"}}}'''
+        dictObj = json.loads(jsonStr)
+        time.sleep(1)
+        yield dictObj
+        
+# Create Topology and read from data source 
+topo = Topology()
+patientData = topo.source(Observations)
+heartRate = patientData.filter(lambda tuple: (tuple['reading']['readingType']['code']=='8867-4'))
+##Filter applies here heartRate is used to filter data with the code 8867-4
+
+# Print
+heartRate.sink(print)
+
+# Submit on Bluemix
+submit('STREAMING_ANALYTICS_SERVICE', topo, cfg)
