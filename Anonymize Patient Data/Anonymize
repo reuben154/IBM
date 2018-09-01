@@ -1,0 +1,54 @@
+#Imports
+from streamsx.topology import schema
+from streamsx.topology.topology import Topology
+from streamsx.topology.context import *
+import json
+import time
+import hashlib
+
+# Import Observation
+from streamsx_health.ingest.Observation import getReadingValue
+
+# Set up access to Streaming Analytics service
+vs={'streaming-analytics': [{'name': service_name, 'credentials': json.loads (credentials)}]}
+cfg = {}
+cfg[ConfigParams.VCAP_SERVICES] = vs
+cfg[ConfigParams.SERVICE_NAME] = service_name
+
+# Anonymize patient data        
+def anonymize(tuple):
+    tuple['patientId'] = hashlib.sha256(tuple['patientId'].encode('utf-8')).digest()
+    device = tuple['device']
+    device['locationId'] = hashlib.sha256(device['locationId'].encode('utf-8')).digest()
+    return tuple
+
+# Define Callable Class to keep state of last 10 tuples
+class Avg:
+    def __init__(self, n):
+        self.n = n
+        self.last_n = []
+        
+    def __call__(self, tuple):
+        self.last_n.append(getReadingValue(tuple))
+        if (len(self.last_n) > self.n):
+            self.last_n.pop(0)   
+        return sum(self.last_n)/len(self.last_n)
+        
+# Create Topology and read from data source
+topo = Topology()
+patientData = topo.subscribe('ingest-beacon', schema.CommonSchema.Json)
+
+# Anonymize patient data before processing
+patientX = patientData.map(anonymize)
+
+# Create new data stream called heartRate
+heartRate = patientX.filter(lambda tuple: (tuple['reading']['readingType']['code']=="8867-4"))
+
+# Avg Heart Rate stream
+avgHr = heartRate.map(Avg(10))
+
+# Print Avg Heart Rate
+avgHr.print()
+
+# Submit on Bluemix
+submit('STREAMING_ANALYTICS_SERVICE', topo, cfg)
